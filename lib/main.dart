@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(
-      new FriendlyChatApp()
-  );
+  runApp(new FriendlyChatApp());
 }
 
 class FriendlyChatApp extends StatelessWidget {
@@ -24,26 +22,41 @@ class ChatScreen extends StatefulWidget {
 }
 
 class ChatScreenState extends State<ChatScreen> {
-
   final TextEditingController _textController = new TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(title: new Text("FriendlyChat"),),
+      appBar: new AppBar(
+        title: new Text("FriendlyChat"),
+      ),
       body: _buildTextComposer(),
     );
   }
 
   Widget _buildTextComposer() {
-    return new Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: new TextField(
-        controller: _textController,
-        onSubmitted: _handleSubmitted,
-        decoration: new InputDecoration.collapsed(hintText: "Send a Message"),
-      ),
-    );
+    return new IconTheme(
+        data: new IconThemeData(color: Theme.of(context).accentColor),
+        child: new Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: new Row(
+            children: <Widget>[
+              new Flexible(
+                  child: new TextField(
+                controller: _textController,
+                onSubmitted: _handleSubmitted,
+                decoration:
+                    new InputDecoration.collapsed(hintText: "Send a Message"),
+              )),
+              new Container(
+                margin: new EdgeInsets.symmetric(horizontal: 4.0),
+                child: new IconButton(
+                    icon: new Icon(Icons.send),
+                    onPressed: () => _handleSubmitted(_textController.text)),
+              )
+            ],
+          ),
+        ));
   }
 
   void _handleSubmitted(String text) {
