@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 void main() {
   runApp(new FriendlyChatApp());
@@ -9,6 +10,9 @@ class FriendlyChatApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: "FriendlyChat",
+      theme: defaultTargetPlatform == TargetPlatform.iOS
+          ? kIOSTheme
+          : kDefaultTheme,
       home: new ChatScreen(),
     );
   }
@@ -24,12 +28,15 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final List<ChatMessage> _message = <ChatMessage>[];
   final TextEditingController _textController = new TextEditingController();
+  bool _isComposing = false;
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: new AppBar(
           title: new Text("FriendlyChat"),
+          elevation:
+              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
         ),
         body: new Column(
           children: <Widget>[
@@ -68,8 +75,11 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
               new Container(
                 margin: new EdgeInsets.symmetric(horizontal: 4.0),
                 child: new IconButton(
-                    icon: new Icon(Icons.send),
-                    onPressed: () => _handleSubmitted(_textController.text)),
+                  icon: new Icon(Icons.send),
+                  onPressed: _isComposing
+                      ? () => _handleSubmitted(_textController.text)
+                      : null,
+                ),
               )
             ],
           ),
@@ -78,6 +88,9 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   void _handleSubmitted(String text) {
     _textController.clear();
+    setState(() {
+      _isComposing = false;
+    });
     ChatMessage message = new ChatMessage(
       text: text,
       animationController: new AnimationController(
@@ -96,8 +109,6 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     }
     super.dispose();
   }
-
-
 }
 
 const String _name = "Joonghyeon Kim";
@@ -125,15 +136,17 @@ class ChatMessage extends StatelessWidget {
                 child: new Text(_name[0]),
               ),
             ),
-            new Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Text(_name, style: Theme.of(context).textTheme.subhead),
-                new Container(
-                  margin: const EdgeInsets.only(top: 5.0),
-                  child: new Text(text),
-                )
-              ],
+            new Expanded(
+              child: new Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  new Text(_name, style: Theme.of(context).textTheme.subhead),
+                  new Container(
+                    margin: const EdgeInsets.only(top: 5.0),
+                    child: new Text(text),
+                  )
+                ],
+              ),
             )
           ],
         ),
@@ -141,3 +154,14 @@ class ChatMessage extends StatelessWidget {
     );
   }
 }
+
+final ThemeData kIOSTheme = new ThemeData(
+  primarySwatch: Colors.orange,
+  primaryColor: Colors.grey[100],
+  primaryColorBrightness: Brightness.light,
+);
+
+final ThemeData kDefaultTheme = new ThemeData(
+  primarySwatch: Colors.purple,
+  accentColor: Colors.orangeAccent[400],
+);
